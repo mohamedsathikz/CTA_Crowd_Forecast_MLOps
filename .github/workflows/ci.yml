@@ -7,6 +7,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    # MySQL Database Service configuration matching your local setup
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: 0207
+          MYSQL_DATABASE: cta_ridership
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping -h localhost" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -21,6 +33,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Test training script
+    - name: Test training script with Database
+      env:
+        DB_HOST: 127.0.0.1
+        DB_USER: root
+        DB_PASSWORD: 0207
+        DB_NAME: cta_ridership
       run: |
         python train.py
